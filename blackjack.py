@@ -1,29 +1,51 @@
 from random import randint, random
-All_Cards =['Ace','Two','Three','Four','Five','Six','Seven','Eight','Nine', 'Ten','Jack','Queen','King']
-All_suits=['Diamonds', 'Hearts','Clubs','Spade']
-cards_with_points={'Ace':1, 'Two':2, 'Three':3, 'Four':4, 'Five':5,'Six':6,'Seven':7, 'Eight':8, 'Nine':9, 'Ten':10, 'Jack':10, 'Queen':10, 'King':10}
+import random
+def deck(list):
+    for i in range(1,14):
+        for s in ["Spades","Clubs","Heart","Diamonds"]:
+            if i== 1:
+                    i = 'Ace'
+            elif i == 11:
+                    i = 'Jack'
+            elif i == 12:
+                    i = 'Queen'
+            elif i == 13:
+                    i = 'King'
+            list.append([i,s])
+    random.shuffle(list)
+    return list
+def print_card(list):
+    return print("{} of {}".format(list[0],list[1]))
+
+All_Cards = deck([])
+print(All_Cards)
+
 dealer_cards=[]
 player_cards=[]
 
 def select_random_card():
-    random_number_for_cards= randint(0,12)
-    random_number_for_suits=randint(0,3)
+    random_number_for_cards= randint(0,52)
     card = All_Cards[random_number_for_cards]
-    suit = All_suits[random_number_for_suits]
-    return [card,suit]
+    return card
 
 def deal_card(list):
-   list.append(select_random_card())
-   return list
+    card = select_random_card()
+    list.append(card)
+    All_Cards.remove(card)
+    return list
 
 def calculate_card_points(card_list):
     card_points=0
     for card in card_list:
-        card_points+=cards_with_points[card[0]]
+        if card[0] == 'Jack' or card[0] == 'Queen' or card[0] == 'King':
+            card[0]=10
+        elif card[0] == 'Ace':
+            card[0]=1 
+        card_points += card[0]
+        
     return card_points
 
     
-
 def deal_initial_cards(dealer_card_list, player_card_list):
     for i in  range(0,2):
         deal_card(dealer_card_list)
@@ -39,8 +61,10 @@ def deal_initial_cards(dealer_card_list, player_card_list):
 
 def string_dealer_card(dealer_cards):
     dealer_card_string="The dealers cards are: "
-    for number, suit in dealer_cards:
-        dealer_card_string += number + " of " + suit + ", "
+    for card in dealer_cards:
+        dealer_card_string += " {} of {}".format(card[0],card[1]) + ', '
+        
+    
     return dealer_card_string
 
 deal_initial_cards(dealer_cards,player_cards)
@@ -61,7 +85,9 @@ while player_cards_being_dealt:
       break
   elif var == "no":
       break
+
 upper_limit_dealer = randint(17,20)
+
 while True:
     if player_points > 21:
         break
@@ -71,7 +97,6 @@ while True:
      dealer_points=calculate_card_points(dealer_cards)
     if dealer_points > player_points and dealer_points <22:
          print(string_dealer_card(dealer_cards))
-         print(dealer_cards)
          print('You Lose!')
          break
     elif dealer_points < player_points and player_points < 22:
@@ -79,7 +104,6 @@ while True:
          print("You Win!")
          break
     elif dealer_points > 21:
-        print(dealer_cards)
         print(string_dealer_card(dealer_cards))
         print("The dealer has gon bust with {card_points} points, therefore you win!".format(card_points = dealer_points))
         break

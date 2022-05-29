@@ -1,7 +1,10 @@
 from random import randint, random
 import random
 def deck(list):
+<<<<<<< HEAD
     for i in range(1,14):
+=======
+>>>>>>> f9681364f6b52403cf1f3c0b928aa25865693576
         for s in ["Spades","Clubs","Heart","Diamonds"]:
             if i== 1:
                     i = 'Ace'

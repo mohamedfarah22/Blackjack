@@ -18,18 +18,20 @@ def print_card(list):
     return print("{} of {}".format(list[0],list[1]))
 
 All_Cards = deck([])
-print(All_Cards)
+
 
 dealer_cards=[]
 player_cards=[]
 
-def select_random_card():
-    random_number_for_cards= randint(0,52)
-    card = All_Cards[random_number_for_cards]
+def select_random_card(upper_limit = 51):
+    random_index= random.randint(0,upper_limit)
+    card = All_Cards[random_index]
     return card
 
 def deal_card(list):
-    card = select_random_card()
+    upper_limit = 51
+    upper_limit = len(All_Cards) - 1
+    card = select_random_card(upper_limit)
     list.append(card)
     All_Cards.remove(card)
     return list
@@ -86,26 +88,30 @@ while player_cards_being_dealt:
   elif var == "no":
       break
 
-upper_limit_dealer = randint(17,20)
+upper_limit_dealer = randint(16,19)
 
 while True:
     if player_points > 21:
         break
-    elif dealer_points <upper_limit_dealer:
+    elif dealer_points < upper_limit_dealer and player_points < 22:
      deal_card(dealer_cards)
      print('The dealer has dealt {card} of {suit}'.format(card = dealer_cards[-1][0], suit = dealer_cards[-1][1]))
      dealer_points=calculate_card_points(dealer_cards)
-    if dealer_points > player_points and dealer_points <22:
-         print(string_dealer_card(dealer_cards))
-         print('You Lose!')
-         break
-    elif dealer_points < player_points and player_points < 22:
-         print(string_dealer_card(dealer_cards))
-         print("You Win!")
-         break
-    elif dealer_points > 21:
-        print(string_dealer_card(dealer_cards))
-        print("The dealer has gon bust with {card_points} points, therefore you win!".format(card_points = dealer_points))
+    else:
         break
+
+
+if dealer_points > player_points and dealer_points <22:
+    print(string_dealer_card(dealer_cards))
+    print('You Lose!')
+    
+elif dealer_points < player_points and player_points < 22:
+    print(string_dealer_card(dealer_cards))
+    print("You Win!")
+    
+elif dealer_points > 21:
+    print(string_dealer_card(dealer_cards))
+    print("The dealer has gon bust with {card_points} points, therefore you win!".format(card_points = dealer_points))
+    
 
 

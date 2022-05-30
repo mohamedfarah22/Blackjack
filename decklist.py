@@ -8,8 +8,9 @@ class Deck:
     def shuffle_deck(self):
         return random.shuffle(self.deck)
 class Player:
-    def __init__(self,name):
+    def __init__(self,name,next_player):
         self.name=name
+        self.next_player = next_player
         self.cards=[]
     def welcome_player(self):
         return print("Hello {}, welcome to the game!".format(self.name))
@@ -23,7 +24,46 @@ class Player:
     def get_cards(self):
         return self.cards
     def get_player(self):
-            return self.name  
+            return self.name 
+    def set_next_player(self, next_player):
+          self.next_player = next_player 
+    def get_next_player(self):
+            return self.next_player
+    
+class LinkPlayers:
+        def __init__(self,value):
+                self.head_player=Player(value)
+        def get_head_player(self):
+                return self.head_player
+        def insert_player(self,new_value):
+                new_player = Player(new_value)
+                new_player.set_next_player(self.head_player)
+                self.head_player = new_player
+        def list_of_players(self):
+                string_list=""
+                current_player = self.head_player
+                while current_player:
+                        string_list += str(current_player.get_player())+ "\n" 
+                        current_player = current_player.get_next_player()
+                return string_list
+        def remove_player(self, name_to_remove):
+                current_player = self.get_head_player()
+                if current_player.get_value()==name_to_remove:
+                        self.head_player = current_player.get_next_player()
+                else:
+                        while current_player:
+                                next_player = current_player.get_next_player()
+                                if next_player.get_player() == name_to_remove:
+                                        current_player.set_next_player(next_player.get_next_player())
+                                        current_player = None
+                                else:
+                                        current_player = next_player
+
+
+
+
+
+
 
 def deck(list):
     for i in range(1,14):
@@ -45,12 +85,12 @@ def get_num_players():
         try:
                 int(num_players)
         except ValueError:
-                print("Input is not a nnumber! Try Again!")
+                print("Input is not a number! Try Again!")
                 get_num_players()
         var = input("There will be " +  num_players +  " in the next blackjack game. Press c to confirm or t to try again: ")
         
 
-        if int(num_players)>3:
+        if int(num_players)>7:
                 print("Wrong input! Please try again!")
                 get_num_players()
         if var.lower()=="t":
@@ -59,31 +99,7 @@ def get_num_players():
 
         
         return int(num_players)
-def players_to_init(num_players):
-        print("Ok! We will need some more information before we can begin the game!")
-        players_name_list=[]
-        for i in range(num_players):
-                name = input("Please input player name: ")
-                name.lower()
-                players_name_list.append(name)
-        while num_players>0:
-                if num_players==1:
-                        player_1=Player(players_name_list[0])
-                        num_players-=1
-                if num_players == 2:
-                       player_2=Player(players_name_list[1]) 
-                       num_players-=1
-                if num_players==3:
-                        player_3 = Player(players_name_list[2])
-                        num_players-=1
-        num_players = len(players_name_list)
-        if num_players==1:
-                return player_1
-        if num_players == 2:
-                return player_1, player_2
-        if num_players==3:
-                return player_1, player_2, player_3
-        
+
         
 
        
@@ -95,14 +111,7 @@ def blackjack():
       print("Welcome to blackjack!")
       var = input("Please press any letter on your keyboard to continue: ")
       num_players=get_num_players()
-      dealer = Player("dealer")
-      if num_players==3:
-        player_1,player_2,player_3 = players_to_init(num_players)
-      if num_players==2:
-              player_1, player_2 = players_to_init(num_players)
-      if num_players==1:
-              player_1 = players_to_init(num_players)
-
+      
 
 
 
@@ -112,7 +121,7 @@ def blackjack():
       deck_list = deck([])
       deck_obj = Deck(deck_list)
       deck_obj.shuffle_deck()
-      dealer.deal_card(dealer.cards)
+     
       
 
       

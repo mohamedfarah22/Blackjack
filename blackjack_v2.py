@@ -21,6 +21,7 @@ class Player:
       dealt_card = random.choice(deck.deck)
       self.cards.append(dealt_card)
       deck.deck.remove(dealt_card)
+      self.card_points+=self.get_card_point(dealt_card)
       return print("{} has dealt {} of {}".format(self.name,dealt_card[0],dealt_card[1]))
     def get_cards(self):
         return self.cards
@@ -28,18 +29,12 @@ class Player:
             dealt_card = random.choice(deck.deck)
             self.cards.append(dealt_card)
             deck.deck.remove(dealt_card)
+            self.card_points+=self.get_card_point(dealt_card)
             if len(self.cards)==2:
                    print("{} has dealt the hidden card".format(self.name))
                    return dealt_card
             print("{} has dealt {} of {} ".format(self.name,dealt_card[0],dealt_card[1])) 
             return dealt_card
-    def calculate_initial_card_points(self):
-      for card in self.cards:
-        if card[0] == 'Jack' or card[0] == 'Queen' or card[0] == 'King':
-            card[0]=10
-        elif card[0] == 'Ace':
-            card[0]=1 
-        self.card_points += card[0] 
     def get_card_point(self,card):
              if card[0] == 'Jack' or card[0] == 'Queen' or card[0] == 'King':
                 card[0]=10
@@ -128,19 +123,21 @@ def deck(list):
          
 def get_num_players():
         num_players=input("How many people will be playing this round? Please note there is a maximum of 6 people: ")
+        while True:
+         try:
+                int(num_players)
+                break
+         except ValueError:
+                print("Input is not a number! Try Again!")
+                num_players=input("How many people will be playing this round? Please note there is a maximum of 6 people: ")
         if int(num_players)>6 or int(num_players)<1:
                 print("Wrong input! Please try again!")
                 get_num_players()
-        if int(num_players)<6 and int(num_players)<0:
+        elif int(num_players)<6 and int(num_players)<0:
                 var = input("There will be " +  num_players +  " in the next blackjack game. Press any button to confirm or t to try again: ")
                 if var.lower()=="t":
                  get_num_players()
 
-        try:
-                int(num_players)
-        except ValueError:
-                print("Input is not a number! Try Again!")
-                get_num_players()
         
         return int(num_players)
 
@@ -155,8 +152,8 @@ def init_players_in_linkedlist(player_names,num_players,player_num=1):
               player_names[player_num] = input("Please input player {} name: ".format(player_num))
               player_num+=1
         players=LinkPlayers(player_names[num_players])
-        return players
-def put_init_players_in_dict(num_players,players,player_names={}):
+        return players,player_names
+def reverse_dict_and_init_linkedlist(num_players,players,player_names={}):
         for i in range(num_players-1,0,-1):
           players.insert_player(player_names[i])
         players.insert_player("The Dealer")
@@ -175,13 +172,8 @@ def blackjack():
       var = input("Please press any letter on your keyboard to continue: ")
       num_players=get_num_players()
       player_names={}
-      player_num=1
       # init players and put player data into linkedlist'
-      while player_num<num_players+1:
-              player_names[player_num] = input("Please input player {} name: ".format(player_num))
-              player_num+=1
-      players=LinkPlayers(player_names[num_players])
-      print(player_names)
+      players, player_names=init_players_in_linkedlist(player_names,num_players)
       for i in range(num_players-1,0,-1):
         players.insert_player(player_names[i])
       players.insert_player("The Dealer") 
@@ -201,9 +193,7 @@ def blackjack():
               var.lower()
               if var == "y":
                      current_player.deal_card(deck_obj) 
-                     current_player.calculate_initial_card_points()
-                     current_player_points = current_player.get_card_points()
-                     if current_player_points>21:
+                     if current_player.get_card_points()>21:
                         print("{} has gon bust!".format(current_player.name))
                         current_player.is_bust = True
                         current_player = current_player.get_next_player()
@@ -211,20 +201,20 @@ def blackjack():
                 current_player = current_player.get_next_player()
       #deal additional cards based on dealer choice
       dealer = players.get_head_player()
-      dealer.calculate_initial_card_points()
+     
       
       while True:
         if dealer.card_points < 17:
-              dealt_card = dealer.deal_dealer_card(deck_obj)
-              dealer.card_points += dealer.get_card_point(dealt_card)
+             dealer.deal_dealer_card(deck_obj)
+             
         
 
-        elif dealer.card_points >= 17:
+        if dealer.card_points >= 17 and dealer.card_points<22:
                break
                
-        elif dealer.card_points>21:
+        if dealer.card_points>21:
                print("The dealer has gone bust!")
-               dealer.is_bust==True
+               dealer.is_bust=True
                break
               
       
@@ -244,21 +234,45 @@ def blackjack():
            current_player.get_next_player()
            current_player = current_player.get_next_player()
       
-          
 
       if len(player_points_not_bust)>0:
-        winner = max(player_points_not_bust, key = player_points_not_bust.get)
-        winner_cards = all_player_points[winner]
-        winning_statement = ""
-        for card in winner_cards:
+        values = player_points_not_bust.values()
+        max_value = max(values)
+        winners = []
+        for name in player_points_not_bust:
+                if player_points_not_bust[name]==max_value:
+                        winners.append(name)
+        
+        if len(winners)==1:   
+         winner = winners[0]             
+         winner_cards = all_player_points[winner]
+         winning_statement = ""
+         for card in winner_cards:
                 winning_statement += "{} of {}, ".format(card[0],card[1])
-        print("{} is the winner of this game with the following cards: ".format(winner) + winning_statement)
-             
+        
+         print("{} is the winner of this game with the following cards: ".format(winner) + winning_statement)
+        if len(winners)>1:
+                draw_statement=""
+                for winner in winners:
+                        draw_statement+= winner + " with cards " 
+                        winner_cards=all_player_points[winner] 
+                        for card in winner_cards:
+                                draw_statement +="{} of {} ".format(card[0],card[1]) 
+                        
+                print("No Winner! There is a draw between " + draw_statement)
+
+                                
+
+
 blackjack()             
-var = input("Press y to play again: ")
-var.lower
-if var == "y":
- blackjack()
-#fix functionality
+continue_play = True
+while continue_play:
+ var = input("Press y to play again: ")
+ var.lower 
+ if var == "y":
+   blackjack()
+ else:
+   continue_play = False
+
 # refractor to helper functions
 # design test for all cases
